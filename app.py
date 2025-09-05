@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 import json, os
 
 app = Flask(__name__)
@@ -9,7 +9,10 @@ def load_tasks():
     if not os.path.exists(DATA_FILE):
         return []
     with open(DATA_FILE, "r") as f:
-        return json.load(f)
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            return []
 
 def save_tasks(tasks):
     with open(DATA_FILE, "w") as f:
@@ -51,7 +54,8 @@ def delete_task(task_id):
 
 @app.route("/")
 def home():
-    return "Welcome to the To-Do List App! Use http://127.0.0.1:5000/tasks to interact."
+    # Redirect to frontend by default
+    return redirect(url_for("ui"))
 
 @app.route("/ui")
 def ui():
