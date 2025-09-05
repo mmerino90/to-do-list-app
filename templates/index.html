@@ -2,6 +2,10 @@
 <html>
 <head>
   <title>To-Do List</title>
+  <style>
+    li { margin: 5px 0; }
+    button { margin-left: 10px; }
+  </style>
 </head>
 <body>
   <h1>My To-Do List</h1>
@@ -19,9 +23,36 @@
       const tasks = await res.json();
       const list = document.getElementById("task-list");
       list.innerHTML = "";
+
       tasks.forEach(task => {
         const li = document.createElement("li");
         li.textContent = task.title;
+
+        // --- Delete button ---
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Delete";
+        delBtn.onclick = async () => {
+          await fetch(`/tasks/${task.id}`, { method: "DELETE" });
+          loadTasks();
+        };
+        li.appendChild(delBtn);
+
+        // --- Edit button ---
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Edit";
+        editBtn.onclick = async () => {
+          const newTitle = prompt("Edit task:", task.title);
+          if (newTitle) {
+            await fetch(`/tasks/${task.id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ title: newTitle })
+            });
+            loadTasks();
+          }
+        };
+        li.appendChild(editBtn);
+
         list.appendChild(li);
       });
     }
@@ -31,13 +62,14 @@
       const title = document.getElementById("title").value;
       await fetch("/tasks", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({title})
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title })
       });
       document.getElementById("title").value = "";
       loadTasks();
     });
 
+    // Load tasks on page open
     loadTasks();
   </script>
 </body>
