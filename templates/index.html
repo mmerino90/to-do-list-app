@@ -1,19 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>To-Do List</title>
   <style>
-    li { margin: 5px 0; }
-    button { margin-left: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    #task-list {
+      list-style: none;
+      padding: 0;
+      width: 300px;
+    }
+    li {
+      background: #fff;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    li span {
+      flex-grow: 1;
+    }
+    button {
+      margin-left: 8px;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #fff;
+    }
+    .delete {
+      background-color: #e74c3c;
+    }
+    .edit {
+      background-color: #3498db;
+    }
+    form {
+      margin-top: 20px;
+      display: flex;
+    }
+    input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      flex: 1;
+    }
+    form button {
+      background-color: #2ecc71;
+      margin-left: 8px;
+    }
   </style>
 </head>
 <body>
   <h1>My To-Do List</h1>
   <ul id="task-list"></ul>
 
-  <h2>Add Task</h2>
   <form id="task-form">
-    <input type="text" id="title" placeholder="Task title" required>
+    <input type="text" id="title" placeholder="Enter a task..." required>
     <button type="submit">Add</button>
   </form>
 
@@ -26,20 +81,23 @@
 
       tasks.forEach(task => {
         const li = document.createElement("li");
-        li.textContent = task.title;
 
-        // --- Delete button ---
+        const text = document.createElement("span");
+        text.textContent = task.title;
+        li.appendChild(text);
+
         const delBtn = document.createElement("button");
         delBtn.textContent = "Delete";
+        delBtn.className = "delete";
         delBtn.onclick = async () => {
           await fetch(`/tasks/${task.id}`, { method: "DELETE" });
           loadTasks();
         };
         li.appendChild(delBtn);
 
-        // --- Edit button ---
         const editBtn = document.createElement("button");
         editBtn.textContent = "Edit";
+        editBtn.className = "edit";
         editBtn.onclick = async () => {
           const newTitle = prompt("Edit task:", task.title);
           if (newTitle) {
@@ -69,7 +127,6 @@
       loadTasks();
     });
 
-    // Load tasks on page open
     loadTasks();
   </script>
 </body>
