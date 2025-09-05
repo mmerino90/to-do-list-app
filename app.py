@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import json, os
 
 app = Flask(__name__)
@@ -51,7 +51,11 @@ def delete_task(task_id):
 
 @app.route("/")
 def home():
-    return "Welcome to the To-Do List App! Use /tasks to interact."
+    return "Welcome to the To-Do List App! Use http://xx.xx.xx.xx:xx/tasks to interact."
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+@app.route("/ui")
+def ui():
+    return render_template("index.html")
