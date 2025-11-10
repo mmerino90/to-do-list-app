@@ -1,7 +1,13 @@
 """Test configuration."""
+import os
+import sys
 import pytest
+
+# Ensure project root is on sys.path so tests can import the `app` package
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from app import create_app
-from app.models.task import db as _db
+from app.extensions import db as _db
 
 @pytest.fixture
 def app():
@@ -14,8 +20,7 @@ def db(app):
     """Create database for the tests."""
     with app.app_context():
         _db.create_all()
-    yield _db
-    with app.app_context():
+        yield _db
         _db.drop_all()
 
 @pytest.fixture
