@@ -1,13 +1,13 @@
 """Application factory module."""
 import os
 from flask import Flask
-from prometheus_flask_exporter import PrometheusMetrics
 
 from config.settings import config
-from app.models.task import db
+from app.extensions import db, metrics
 from app.api import tasks as tasks_api
 from app.web import routes as web_routes
 from app.utils.error_handlers import register_error_handlers
+
 
 def create_app(config_name=None):
     """Create Flask application."""
@@ -24,7 +24,7 @@ def create_app(config_name=None):
     
     # Initialize extensions
     db.init_app(app)
-    PrometheusMetrics(app)
+    metrics.init_app(app)
     
     # Register blueprints
     app.register_blueprint(tasks_api.bp)

@@ -1,14 +1,13 @@
 """Database models for the application."""
 from datetime import datetime
-from typing import Optional, Any
+from typing import Optional
 
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 
-# Allow type-checking to treat the flask-sqlalchemy object as dynamic
-db: Any = SQLAlchemy()
+from app.extensions import db
 
-class Task(db.Model):
+
+class Task(db.Model):  # type: ignore[name-defined]
     """Task model."""
     
     __tablename__ = "tasks"
