@@ -12,3 +12,5 @@ def index():
 @bp.route("", strict_slashes=False)
 def ui_root():
     return redirect(url_for("web.index"))
+
+

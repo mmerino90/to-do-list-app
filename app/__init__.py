@@ -1,6 +1,6 @@
 """Application factory module."""
 import os
-from flask import Flask
+from flask import Flask, redirect, url_for
 from config.settings import config  # your config dict
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -17,28 +17,21 @@ def create_app(config_name: str | None = None) -> Flask:
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
-    # Import inside the factory to avoid circular imports
+    # Init extensions (import INSIDE to avoid circulars)
     from app.extensions import db, metrics
     db.init_app(app)
     metrics.init_app(app)
 
-    # Blueprints (import here, then register)
+    # Blueprints
     from app.api.tasks import bp as tasks_bp
     from app.web.routes import bp as web_bp
-    # If you have health/metrics blueprints in app/ops:
-    try:
-        from app.ops.health import bp as health_bp
-        app.register_blueprint(health_bp, url_prefix="/api/v1")
-    except Exception:
-        pass
-    try:
-        from app.ops.metrics import bp as prom_metrics_bp
-        app.register_blueprint(prom_metrics_bp, url_prefix="/api/v1")
-    except Exception:
-        pass
-
     app.register_blueprint(tasks_bp, url_prefix="/api/v1")
     app.register_blueprint(web_bp, url_prefix="/ui")
+
+    # Root redirect: / -> /ui/
+    def _root():
+        return redirect(url_for("web.index"))
+    app.add_url_rule("/", view_func=_root, endpoint="root", strict_slashes=False)
 
     # Error handlers
     from app.utils.error_handlers import register_error_handlers
