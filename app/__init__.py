@@ -1,16 +1,9 @@
 """Application factory module."""
 import os
-from flask import Flask, redirect, url_for
+from flask import Flask
+from config.settings import config  # your config dict
 
-from config.settings import config
-from app.extensions import db, metrics
-from app.api import tasks as tasks_api
-from app.web import routes as web_routes
-from app.utils.error_handlers import register_error_handlers
-
-
-def create_app(config_name=None):
-    """Create Flask application."""
+def create_app(config_name: str | None = None) -> Flask:
     if config_name is None:
         config_name = os.getenv("FLASK_ENV", "development")
 
@@ -24,23 +17,34 @@ def create_app(config_name=None):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
-    # Initialize extensions
+    # Import inside the factory to avoid circular imports
+    from app.extensions import db, metrics
     db.init_app(app)
     metrics.init_app(app)
 
-    # Register blueprints WITH PREFIXES
-    app.register_blueprint(tasks_api.bp, url_prefix="/api/v1")
-    app.register_blueprint(web_routes.bp, url_prefix="/ui")
+    # Blueprints (import here, then register)
+    from app.api.tasks import bp as tasks_bp
+    from app.web.routes import bp as web_bp
+    # If you have health/metrics blueprints in app/ops:
+    try:
+        from app.ops.health import bp as health_bp
+        app.register_blueprint(health_bp, url_prefix="/api/v1")
+    except Exception:
+        pass
+    try:
+        from app.ops.metrics import bp as prom_metrics_bp
+        app.register_blueprint(prom_metrics_bp, url_prefix="/api/v1")
+    except Exception:
+        pass
 
-    # Convenience: redirect root URL to the UI
-    @app.route('/')
-    def _root_redirect():
-        return redirect(url_for('web.index'))
+    app.register_blueprint(tasks_bp, url_prefix="/api/v1")
+    app.register_blueprint(web_bp, url_prefix="/ui")
 
-    # Register global error handlers
+    # Error handlers
+    from app.utils.error_handlers import register_error_handlers
     register_error_handlers(app)
 
-    # Create database tables
+    # DB tables
     with app.app_context():
         db.create_all()
 
