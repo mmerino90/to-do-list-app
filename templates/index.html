@@ -31,62 +31,6 @@
         <ul id="task-list" class="task-list"></ul>
     </div>
     
-    <script
-    async function loadTasks() {
-      const res = await fetch("/tasks");
-      const tasks = await res.json();
-      const list = document.getElementById("task-list");
-      list.innerHTML = "";
-
-      tasks.forEach(task => {
-        const li = document.createElement("li");
-
-        const text = document.createElement("span");
-        text.textContent = task.title;
-        li.appendChild(text);
-
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "Delete";
-        delBtn.className = "delete";
-        delBtn.onclick = async () => {
-          await fetch(`/tasks/${task.id}`, { method: "DELETE" });
-          loadTasks();
-        };
-        li.appendChild(delBtn);
-
-        const editBtn = document.createElement("button");
-        editBtn.textContent = "Edit";
-        editBtn.className = "edit";
-        editBtn.onclick = async () => {
-          const newTitle = prompt("Edit task:", task.title);
-          if (newTitle) {
-            await fetch(`/tasks/${task.id}`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ title: newTitle })
-            });
-            loadTasks();
-          }
-        };
-        li.appendChild(editBtn);
-
-        list.appendChild(li);
-      });
-    }
-
-    document.getElementById("task-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const title = document.getElementById("title").value;
-      await fetch("/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title })
-      });
-      document.getElementById("title").value = "";
-      loadTasks();
-    });
-
-    loadTasks();
-  </script>
+    <script src="{{ url_for('static', filename='js/tasks.js') }}"></script>
 </body>
 </html>
