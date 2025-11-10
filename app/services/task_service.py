@@ -1,0 +1,43 @@
+"""Task service module."""
+from typing import List, Optional
+
+from app.models.task import Task, db
+from app.schemas.task import TaskCreate, TaskUpdate
+
+class TaskService:
+    """Service for handling task operations."""
+    
+    @staticmethod
+    def get_all_tasks() -> List[Task]:
+        """Get all tasks."""
+        return Task.query.order_by(Task.created_at.desc()).all()
+    
+    @staticmethod
+    def get_task_by_id(task_id: int) -> Optional[Task]:
+        """Get task by ID."""
+        return Task.query.get(task_id)
+    
+    @staticmethod
+    def create_task(task_data: TaskCreate) -> Task:
+        """Create a new task."""
+        task = Task(
+            title=task_data.title,
+            description=task_data.description
+        )
+        db.session.add(task)
+        db.session.commit()
+        return task
+    
+    @staticmethod
+    def update_task(task: Task, task_data: TaskUpdate) -> Task:
+        """Update an existing task."""
+        for key, value in task_data.dict(exclude_unset=True).items():
+            setattr(task, key, value)
+        db.session.commit()
+        return task
+    
+    @staticmethod
+    def delete_task(task: Task) -> None:
+        """Delete a task."""
+        db.session.delete(task)
+        db.session.commit()

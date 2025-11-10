@@ -1,2 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+
+# SQLite DB
+todo.db
+
+# Flask instance
+instance/
+
+# Environment
+.env
+
+# Logs
+logs/
+
+# Editor
+.vscode/
+.idea/
+
+# Runtime
+*.log
+
+# Ignore task file from original app
+tasks.json
 #Ignore runtime task storage file
 tasks.json 
