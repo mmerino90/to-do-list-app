@@ -25,8 +25,3 @@ logs/
 
 # Runtime
 *.log
-
-# Ignore task file from original app
-tasks.json
-#Ignore runtime task storage file
-tasks.json 
