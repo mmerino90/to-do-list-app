@@ -16,4 +16,6 @@ EXPOSE 8000
 # Optional built-in healthcheck
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -fsS http://localhost:8000/api/v1/health || exit 1
 
-CMD ["gunicorn", "-w", "2", "-k", "gthread", "--threads", "4", "-b", "0.0.0.0:8000", "wsgi:app"]
+
+ENV PORT=8000
+CMD ["bash","-lc","gunicorn -w 2 -k gthread --threads 4 -b 0.0.0.0:${PORT:-8000} wsgi:app"]
