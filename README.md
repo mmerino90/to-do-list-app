@@ -1,133 +1,102 @@
-📝 To-Do List App
+git clone https://github.com/mmerino90/to-do-list-app.git
+to-do-list-app/
+# To-Do List App
 
-A minimal full-stack To-Do List application built with Flask (Python).
+This repository contains a refactored, modular Flask To-Do application intended to be
+maintainable and production-ready. The app uses an application factory, SQLAlchemy for
+persistence, Pydantic for validation, and includes structured error handling and metrics.
 
-This project demonstrates:
+## Features
 
-CRUD functionality (Create, Read, Update, Delete)
+- REST API under `/api/v1` for tasks (CRUD)
+- Web UI served under `/ui`
+- SQLite (SQLAlchemy) for persistence
+- Pydantic schemas for request validation
+- Prometheus metrics endpoint (`/api/v1/metrics`)
+- Centralized error handlers and structured logging
 
-Persistent storage using tasks.json
+## Prerequisites
 
-RESTful API endpoints at /tasks
+- Python 3.11+
+- Git
 
-A clean frontend UI at /ui (the homepage / redirects here)
+## Local development (Windows PowerShell)
 
-It was developed as part of an academic assignment to illustrate how a minimal application can later be adapted into a DevOps pipeline.
+1. Clone the repo and change directory:
 
-🚀 Setup Instructions
-1. Clone this repository
+```powershell
 git clone https://github.com/mmerino90/to-do-list-app.git
 cd to-do-list-app
+```
 
-2. Create and activate a virtual environment (Windows PowerShell)
-python -m venv venv
-venv\Scripts\activate
+2. Create and activate a virtual environment:
 
-3. Install dependencies
+```powershell
+python -m venv .\venv
+.\venv\Scripts\Activate.ps1
+```
+
+3. Install project dependencies:
+
+```powershell
 pip install -r requirements.txt
+```
 
-4. Run the application
-python app.py
+4. Create a `.env` file (do NOT commit this file). Example contents:
 
-5. Open in browser
+```env
+SECRET_KEY=dev-secret-key
+FLASK_ENV=development
+DATABASE_URL=sqlite:///todo.db
+LOG_LEVEL=DEBUG
+# DEBUG_METRICS=1
+```
 
-Frontend UI: http://127.0.0.1:5000/
+5. Run the app (development):
 
-API (raw JSON): http://127.0.0.1:5000/tasks
+```powershell
+python run.py
+```
 
-🧭 Usage
-✅ Using the Frontend (UI)
+Open the frontend at http://127.0.0.1:5000/ui and the API under `/api/v1`.
 
-Add a task with the input field and Add button.
+## Testing
 
-Update a task with the Edit button.
+Run unit and integration tests and show coverage for the `app` package:
 
-Remove a task with the Delete button.
+```powershell
+pytest --cov=app --cov-report=term-missing
+```
 
-Tasks are stored in tasks.json and persist between sessions.
+## Linting & type checks
 
-✅ Using the API (PowerShell examples)
+Run the linters locally:
 
-Add a task
+```powershell
+python -m flake8 .
+python -m mypy app --ignore-missing-imports
+```
 
-curl -Method POST -Uri "http://127.0.0.1:5000/tasks" `
-     -Body '{"title":"Buy milk"}' -ContentType "application/json"
+## Continuous Integration
 
+This repository includes a GitHub Actions workflow `.github/workflows/ci.yml` that
+installs dependencies, runs linters, executes tests and uploads coverage.
 
-Get all tasks
+## Project layout
 
-curl http://127.0.0.1:5000/tasks
+- `run.py` — development entrypoint (calls the application factory)
+- `app/` — application package (factory, blueprints, models, services, schemas, utils)
+- `config/` — configuration classes and environment loading
+- `static/`, `templates/` — UI assets and templates
+- `tests/` — pytest tests
 
+## Notes
 
-Update task #1
+- Keep secrets out of source control; use `.env` locally and a secrets manager in prod.
+- For production deploy behind a WSGI server (gunicorn or waitress) and set `FLASK_ENV=production`.
+- If you want stronger deduplication for create requests, consider an idempotency-key pattern.
 
-curl -Method PUT -Uri "http://127.0.0.1:5000/tasks/1" `
-     -Body '{"title":"Buy almond milk"}' -ContentType "application/json"
-
-
-Delete task #1
-
-curl -Method DELETE -Uri "http://127.0.0.1:5000/tasks/1"
-
-
-👉 On macOS/Linux or Git Bash, use the curl -X format instead:
-
-curl -X POST -H "Content-Type: application/json" \
-     -d '{"title":"Buy milk"}' http://127.0.0.1:5000/tasks
-
-📂 Project Structure
-to-do-list-app/
-│── app.py               # Flask backend (API + routes + redirect to UI)
-│── tasks.json           # Persistent storage file
-│── requirements.txt     # Python dependencies
-│── README.md            # Documentation
-│── templates/
-│    └── index.html      # Frontend (HTML + CSS + JS)
-│── docs/
-     └── architecture.png   # Architecture diagram (for the report)
-
-🔌 API Endpoints
-
-GET /tasks → Retrieve all tasks
-
-POST /tasks → Create a new task (JSON body: {"title": "..."})
-
-PUT /tasks/<id> → Update a task by ID
-
-DELETE /tasks/<id> → Delete a task by ID
-
-Task format:
-
-{ "id": 1, "title": "Buy milk" }
-
-🛠 Troubleshooting
-
-ModuleNotFoundError: No module named 'flask'
-Make sure the venv is activated and run:
-
-pip install -r requirements.txt
-
-
-tasks.json JSON decode error (empty or corrupted file)
-Reset the file content to:
-
-[]
-
-
-Port already in use
-Run Flask on a different port:
-
-$env:FLASK_RUN_PORT=5001
-python app.py
-
-📌 Notes for Scaling (DevOps Context)
-
-Replace tasks.json with a proper database (PostgreSQL, MySQL, or MongoDB).
-
-Containerize with Docker for consistent deployment.
-
-Add CI/CD pipelines (GitHub Actions, Jenkins) for automated testing and deployment.
-
-Use monitoring and logging (Prometheus, Grafana, ELK stack) in production.
-
-Implement authentication & authorization for multi-user support.
+If you'd like, I can:
+- Add a `.env.example` documenting required env vars.
+- Add a production `wsgi.py` and a Dockerfile.
+- Add CI status badges to this README.

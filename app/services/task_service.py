@@ -11,7 +11,10 @@ class TaskService:
     @staticmethod
     def get_all_tasks() -> List[Task]:
         """Get all tasks."""
-        return Task.query.order_by(Task.created_at.desc()).all()
+        query = Task.query.order_by(
+            Task.created_at.desc()  # type: ignore[attr-defined]
+        )
+        return query.all()  # type: ignore[attr-defined]
     
     @staticmethod
     def get_task_by_id(task_id: int) -> Optional[Task]:
@@ -30,7 +33,7 @@ class TaskService:
             Task.title == task_data.title,
             Task.description == task_data.description,
             Task.created_at >= window_start
-        ).order_by(Task.created_at.desc()).first()
+        ).order_by(Task.created_at.desc()).first()  # type: ignore[attr-defined]
         if recent:
             return recent
 

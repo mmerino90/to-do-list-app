@@ -1,7 +1,7 @@
 """Application configuration module."""
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from dotenv import load_dotenv
 
@@ -78,7 +78,7 @@ class ProductionConfig(Config):
         app.logger.addHandler(file_handler)
 
 
-config: Dict[str, Config] = {
+config: Dict[str, type[Config]] = {
     "development": DevelopmentConfig,
     "testing": TestingConfig,
     "production": ProductionConfig,

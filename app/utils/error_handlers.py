@@ -1,7 +1,7 @@
 """Error handlers and custom exceptions."""
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, Optional
 
-from flask import jsonify
+from flask import jsonify, Response
 
 
 class APIError(Exception):
@@ -9,7 +9,7 @@ class APIError(Exception):
     
     status_code = 500
     
-    def __init__(self, message: str, status_code: int = None) -> None:
+    def __init__(self, message: str, status_code: Optional[int] = None) -> None:
         """Initialize the error."""
         super().__init__()
         self.message = message
@@ -31,7 +31,7 @@ def register_error_handlers(app):
     """Register error handlers with the Flask app."""
     
     @app.errorhandler(APIError)
-    def handle_api_error(error: APIError) -> Tuple[Dict[str, Any], int]:
+    def handle_api_error(error: APIError) -> Response:
         """Handle API errors."""
         response = jsonify(error.to_dict())
         response.status_code = error.status_code
