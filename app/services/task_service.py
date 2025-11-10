@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from app.models.task import Task, db
 from app.schemas.task import TaskCreate, TaskUpdate
+from datetime import datetime, timedelta
 
 class TaskService:
     """Service for handling task operations."""
@@ -20,6 +21,19 @@ class TaskService:
     @staticmethod
     def create_task(task_data: TaskCreate) -> Task:
         """Create a new task."""
+        # Simple deduplication: if an identical task (title+description) was created
+        # in the last 2 seconds, return it instead of creating a duplicate. This
+        # guards against accidental duplicate requests from clients.
+        now = datetime.utcnow()
+        window_start = now - timedelta(seconds=2)
+        recent = Task.query.filter(
+            Task.title == task_data.title,
+            Task.description == task_data.description,
+            Task.created_at >= window_start
+        ).order_by(Task.created_at.desc()).first()
+        if recent:
+            return recent
+
         task = Task(
             title=task_data.title,
             description=task_data.description
