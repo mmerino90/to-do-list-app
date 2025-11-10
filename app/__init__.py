@@ -1,7 +1,7 @@
 """Application factory module."""
 import os
 from flask import Flask, redirect, url_for
-from config.settings import config  # your config dict
+from config.settings import config
 
 def create_app(config_name: str | None = None) -> Flask:
     if config_name is None:
@@ -17,7 +17,7 @@ def create_app(config_name: str | None = None) -> Flask:
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
-    # Init extensions (import INSIDE to avoid circulars)
+    # Init extensions
     from app.extensions import db, metrics
     db.init_app(app)
     metrics.init_app(app)
@@ -28,6 +28,18 @@ def create_app(config_name: str | None = None) -> Flask:
     app.register_blueprint(tasks_bp, url_prefix="/api/v1")
     app.register_blueprint(web_bp, url_prefix="/ui")
 
+    # Optional ops blueprints
+    try:
+        from app.ops.health import bp as health_bp
+        app.register_blueprint(health_bp, url_prefix="/api/v1")
+    except Exception:
+        pass
+    try:
+        from app.ops.metrics import bp as prom_metrics_bp
+        app.register_blueprint(prom_metrics_bp, url_prefix="/api/v1")
+    except Exception:
+        pass
+
     # Root redirect: / -> /ui/
     def _root():
         return redirect(url_for("web.index"))
@@ -36,6 +48,11 @@ def create_app(config_name: str | None = None) -> Flask:
     # Error handlers
     from app.utils.error_handlers import register_error_handlers
     register_error_handlers(app)
+
+    # ✅ Simple ping route for CI/CD validation
+    @app.route("/api/v1/ping", methods=["GET"])
+    def ping():
+        return {"message": "pong"}, 200
 
     # DB tables
     with app.app_context():
