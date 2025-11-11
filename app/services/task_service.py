@@ -1,7 +1,6 @@
 """Task service module."""
 from typing import List, Optional
 from datetime import datetime, timedelta
-
 from app.extensions import db
 from app.models.task import Task
 from app.schemas.task import TaskCreate, TaskUpdate

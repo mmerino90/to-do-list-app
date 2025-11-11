@@ -18,10 +18,10 @@ class Config:
     DEBUG: bool = False
     TESTING: bool = False
 
-    # Database (env wins; fallback to project-root/todo.db)
+    # Database (env wins; fallback to SQLite in development if not specified)
     SQLALCHEMY_DATABASE_URI: str = os.getenv(
-        "DATABASE_URL",
-        f"sqlite:///{(BASE_DIR / 'todo.db').as_posix()}"
+        "DATABASE_URL", 
+        f"postgresql://postgres:{os.getenv('POSTGRES_PASSWORD', 'your_password')}@localhost:5432/todo"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
@@ -38,6 +38,10 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     LOG_LEVEL = "DEBUG"
+    SQLALCHEMY_DATABASE_URI = os.getenv(
+        "DATABASE_URL", 
+        f"postgresql://postgres:{os.getenv('POSTGRES_PASSWORD', 'your_password')}@localhost:5432/todo"
+    )
 
 
 class TestingConfig(Config):

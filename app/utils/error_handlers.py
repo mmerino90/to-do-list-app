@@ -1,8 +1,6 @@
 """Error handlers and custom exceptions."""
 from __future__ import annotations
-
 from typing import Any, Dict, Optional, Tuple
-
 from flask import jsonify, Response
 from werkzeug.exceptions import UnprocessableEntity, NotFound, InternalServerError
 
