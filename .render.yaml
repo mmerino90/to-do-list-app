@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: todo-app
+    env: docker
+    plan: free
+    branch: main
+    autoDeploy: true
+
+    dockerfilePath: ./Dockerfile
+
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PROMETHEUS_ENABLED
+        value: true
+      - key: SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        value: sqlite:////app/instance/todo.db
+
+    disk:
+      name: todo-db
+      mountPath: /app/instance
+      sizeGB: 1
