@@ -5,82 +5,82 @@ from typing import Any, Dict
 
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# Load environment variables from .env file (ignored in production if not present)
 load_dotenv()
 
-# Base directory of the project
-BASE_DIR = Path(__file__).parent.parent
+# Base directory of the project (…/app/.. -> project root)
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 class Config:
     """Base configuration."""
-    
-    # Flask configuration
+    # Flask
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key")
     DEBUG: bool = False
     TESTING: bool = False
-    
-    # SQLAlchemy configuration
+
+    # Database (env wins; fallback to project-root/todo.db)
     SQLALCHEMY_DATABASE_URI: str = os.getenv(
         "DATABASE_URL",
-        f"sqlite:///{BASE_DIR / 'todo.db'}"
+        f"sqlite:///{(BASE_DIR / 'todo.db').as_posix()}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
-    
-    # Logging configuration
+
+    # Logging
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
-    
+
     @staticmethod
     def init_app(app: Any) -> None:
-        """Initialize application configuration."""
+        """Hook for env-specific setup."""
+        # Nothing for base; subclasses may extend.
         pass
 
 
 class DevelopmentConfig(Config):
-    """Development configuration."""
-    
     DEBUG = True
     LOG_LEVEL = "DEBUG"
 
 
 class TestingConfig(Config):
-    """Testing configuration."""
-    
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     LOG_LEVEL = "DEBUG"
 
 
 class ProductionConfig(Config):
-    """Production configuration."""
-    
     @classmethod
     def init_app(cls, app: Any) -> None:
         """Production-specific initialization."""
-        Config.init_app(app)
-        
-        # Configure production-specific logging
+        super(ProductionConfig, cls).init_app(app)
+
         import logging
         from logging.handlers import RotatingFileHandler
-        
-        if not os.path.exists("logs"):
-            os.mkdir("logs")
-            
+
+        # Absolute logs dir under project root; safe even if it exists
+        logs_dir = (BASE_DIR / "logs")
+        logs_dir.mkdir(parents=True, exist_ok=True)
+
         file_handler = RotatingFileHandler(
-            "logs/todo.log",
-            maxBytes=10485760,  # 10MB
-            backupCount=10
+            logs_dir / "todo.log",
+            maxBytes=10 * 1024 * 1024,  # 10 MB
+            backupCount=10,
         )
         file_handler.setFormatter(logging.Formatter(
-            "%(asctime)s %(levelname)s: %(message)s "
-            "[in %(pathname)s:%(lineno)d]"
+            "%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]"
         ))
         file_handler.setLevel(logging.INFO)
-        app.logger.addHandler(file_handler)
+
+        # Avoid duplicate handlers if reloading
+        attached = any(isinstance(h, RotatingFileHandler) for h in app.logger.handlers)
+        if not attached:
+            app.logger.addHandler(file_handler)
+
+        app.logger.setLevel(logging.INFO)
+        app.logger.info("Production logging configured")
 
 
 config: Dict[str, type[Config]] = {
     "development": DevelopmentConfig,
     "testing": TestingConfig,
     "production": ProductionConfig,
-    "default": DevelopmentConfig
+    "default": DevelopmentConfig,
 }
