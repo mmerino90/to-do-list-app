@@ -2,12 +2,25 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.mypy_cache
+.pytest_cache
+app/__pycache__
+app/api/__pycache__
+app/models/__pycache__
+app/schemas/__pycache__
+app/services/__pycache__
+app/utils/__pycache__
+app/web/__pycache__
+config/__pycache__/
+tests/__pycache__/
+
+
 
 # Virtual environment
 venv/
 env/
 
-# SQLite DB
+# PostgreSQL DB
 todo.db
 
 # Flask instance
