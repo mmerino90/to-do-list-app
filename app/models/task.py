@@ -1,9 +1,7 @@
 """Database models for the application."""
 from datetime import datetime
 from typing import Optional
-
 from sqlalchemy.sql import func
-
 from app.extensions import db
 
 

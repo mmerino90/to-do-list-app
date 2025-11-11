@@ -1,8 +1,7 @@
 """Application configuration module."""
 import os
 from pathlib import Path
-from typing import Any, Dict  # <-- Import Any here
-
+from typing import Any, Dict  
 from dotenv import load_dotenv
 
 # Load environment variables from .env file (ignored in production if not present)
@@ -17,13 +16,6 @@ class Config:
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key")
     DEBUG: bool = False
     TESTING: bool = False
-
-    # Database (env wins; fallback to SQLite in development if not specified)
-    SQLALCHEMY_DATABASE_URI: str = os.getenv(
-        "DATABASE_URL", 
-        f"postgresql://postgres:{os.getenv('POSTGRES_PASSWORD', 'your_password')}@localhost:5432/todo"
-    )
-    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
     # Logging
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")

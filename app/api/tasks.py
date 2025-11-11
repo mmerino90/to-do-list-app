@@ -1,7 +1,6 @@
 """API routes for tasks."""
 from flask import Blueprint, jsonify, request
 from pydantic import ValidationError
-
 from app.services.task_service import TaskService
 from app.schemas.task import TaskCreate, TaskUpdate
 from app.utils.error_handlers import NotFoundError
