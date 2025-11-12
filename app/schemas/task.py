@@ -33,6 +33,4 @@ class TaskInDB(TaskBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        """Pydantic config."""
-        from_attributes = True
+    model_config = {"from_attributes": True}

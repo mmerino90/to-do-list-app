@@ -8,7 +8,8 @@ from app.schemas.task import TaskCreate, TaskUpdate
 
 class TaskService:
     """Service for handling task operations."""
-    
+    DEDUP_WINDOW_SECONDS = 2  # seconds
+
     @staticmethod
     def get_all_tasks() -> List[Task]:
         """Get all tasks."""
@@ -20,16 +21,17 @@ class TaskService:
     @staticmethod
     def get_task_by_id(task_id: int) -> Optional[Task]:
         """Get task by ID."""
-        return Task.query.get(task_id)
+        # Use Session.get() instead of Query.get() (SQLAlchemy 2.x)
+        return db.session.get(Task, task_id)
     
     @staticmethod
     def create_task(task_data: TaskCreate) -> Task:
         """Create a new task."""
         # Simple deduplication: if an identical task (title+description) was created
-        # in the last 2 seconds, return it instead of creating a duplicate. This
+        # in the last DEDUP_WINDOW_SECONDS, return it instead of creating a duplicate. This
         # guards against accidental duplicate requests from clients.
         now = datetime.utcnow()
-        window_start = now - timedelta(seconds=2)
+        window_start = now - timedelta(seconds=TaskService.DEDUP_WINDOW_SECONDS)
         recent = Task.query.filter(
             Task.title == task_data.title,
             Task.description == task_data.description,
@@ -49,7 +51,7 @@ class TaskService:
     @staticmethod
     def update_task(task: Task, task_data: TaskUpdate) -> Task:
         """Update an existing task."""
-        for key, value in task_data.dict(exclude_unset=True).items():
+        for key, value in task_data.model_dump(exclude_unset=True).items():
             setattr(task, key, value)
         db.session.commit()
         return task

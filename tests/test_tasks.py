@@ -37,7 +37,7 @@ def test_delete_task(client, db, app):
         assert response.status_code == 204
 
         # Verify task is deleted
-        assert Task.query.get(task_id) is None
+    assert db.session.get(Task, task_id) is None
 def test_update_task(client, db, app):
     """Test updating a task."""
     with app.app_context():
