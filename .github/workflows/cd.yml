@@ -45,7 +45,7 @@ jobs:
           --platform managed \
           --region $CLOUD_RUN_REGION \
           --allow-unauthenticated \
-          --set-env-vars DATABASE_URL=${{ secrets.PROD_DATABASE_URL }} \
+          --set-env-vars SQLALCHEMY_DATABASE_URI=${{ secrets.PROD_DATABASE_URL }} \
           --add-cloudsql-instances github-actions-deployer-478018:us-central1:todo-postgres
 
 
