@@ -29,6 +29,14 @@ jobs:
       - name: Set GCP project
         run: gcloud config set project ${{ env.GCP_PROJECT_ID }}
 
+      - name: Verify service account permissions
+        run: |
+          echo "Checking service account permissions..."
+          gcloud projects get-iam-policy ${{ env.GCP_PROJECT_ID }} \
+            --flatten="bindings[].members" \
+            --filter="bindings.members:serviceAccount:*" \
+            --format="table(bindings.role)" || echo "Note: May need artifact registry permissions"
+
       - name: Configure Docker authentication
         run: gcloud auth configure-docker
 
