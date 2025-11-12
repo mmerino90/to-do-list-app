@@ -4,8 +4,14 @@ from flask import Flask, redirect, url_for
 from config.settings import config
 
 def _normalized_db_uri() -> str:
-    """Get database URI from environment and normalize it for SQLAlchemy."""
-    uri = os.getenv("SQLALCHEMY_DATABASE_URI") or os.getenv("DATABASE_URL") or ""
+    """Get database URI from environment and normalize it for SQLAlchemy.
+    
+    NOTE: This should only be used for production (from Cloud Run env vars).
+    For dev/test, the Config classes define their own URIs.
+    """
+    # Only use env vars if we have an explicitly set SQLALCHEMY_DATABASE_URI
+    # (Cloud Run sets this). Ignore .env file DATABASE_URL in test/dev.
+    uri = os.getenv("SQLALCHEMY_DATABASE_URI", "")
     if not uri:
         return ""
     # Heroku-style
