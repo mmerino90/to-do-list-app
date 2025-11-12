@@ -1,0 +1,17 @@
+venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.coverage
+coverage.xml
+.git
+.gitignore
+.dist
+.build
+.idea
+.vscode
+.env
+.env.*
+Dockerfile
+docker-compose.yml
