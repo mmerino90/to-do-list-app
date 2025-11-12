@@ -7,13 +7,14 @@ from pydantic import BaseModel, Field
 
 class TaskBase(BaseModel):
     """Base task schema."""
-    
+
     title: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = None
 
 
 class TaskCreate(TaskBase):
     """Schema for task creation."""
+
     pass
 
 
@@ -27,7 +28,7 @@ class TaskUpdate(BaseModel):
 
 class TaskInDB(TaskBase):
     """Schema for task in database."""
-    
+
     id: int
     completed: bool
     created_at: datetime

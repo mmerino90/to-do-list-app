@@ -1,6 +1,7 @@
 """Test configuration."""
 import os
 import sys
+
 import pytest
 
 # Ensure project root is on sys.path so tests can import the `app` package
@@ -10,16 +11,18 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 os.environ["FLASK_CONFIG"] = "testing"
 os.environ["FLASK_ENV"] = "testing"
 
-from app import create_app
-from app.extensions import db as _db
+from app import create_app  # noqa: E402
+from app.extensions import db as _db  # noqa: E402
+
 
 @pytest.fixture
 def app():
     """Create application for the tests."""
     app = create_app("testing")
     # Ensure we're in testing mode
-    app.config['TESTING'] = True
+    app.config["TESTING"] = True
     return app
+
 
 @pytest.fixture
 def db(app):
@@ -30,10 +33,12 @@ def db(app):
         _db.session.remove()
         _db.drop_all()
 
+
 @pytest.fixture
 def client(app):
     """Create test client."""
     return app.test_client()
+
 
 @pytest.fixture
 def runner(app):

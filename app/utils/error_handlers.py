@@ -7,6 +7,7 @@ from werkzeug.exceptions import UnprocessableEntity, NotFound, InternalServerErr
 
 class APIError(Exception):
     """Base API error with JSON payload."""
+
     status_code = 500
 
     def __init__(self, message: str, status_code: Optional[int] = None) -> None:
@@ -21,6 +22,7 @@ class APIError(Exception):
 
 class NotFoundError(APIError):
     """Resource not found error."""
+
     status_code = 404
 
 

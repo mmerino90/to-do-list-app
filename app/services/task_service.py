@@ -8,6 +8,7 @@ from app.schemas.task import TaskCreate, TaskUpdate
 
 class TaskService:
     """Service for handling task operations."""
+
     DEDUP_WINDOW_SECONDS = 2  # seconds
 
     @staticmethod
@@ -17,13 +18,13 @@ class TaskService:
             Task.created_at.desc()  # type: ignore[attr-defined]
         )
         return query.all()  # type: ignore[attr-defined]
-    
+
     @staticmethod
     def get_task_by_id(task_id: int) -> Optional[Task]:
         """Get task by ID."""
         # Use Session.get() instead of Query.get() (SQLAlchemy 2.x)
         return db.session.get(Task, task_id)
-    
+
     @staticmethod
     def create_task(task_data: TaskCreate) -> Task:
         """Create a new task."""
@@ -32,22 +33,23 @@ class TaskService:
         # guards against accidental duplicate requests from clients.
         now = datetime.utcnow()
         window_start = now - timedelta(seconds=TaskService.DEDUP_WINDOW_SECONDS)
-        recent = Task.query.filter(
-            Task.title == task_data.title,
-            Task.description == task_data.description,
-            Task.created_at >= window_start
-        ).order_by(Task.created_at.desc()).first()  # type: ignore[attr-defined]
+        recent = (
+            Task.query.filter(
+                Task.title == task_data.title,
+                Task.description == task_data.description,
+                Task.created_at >= window_start,
+            )
+            .order_by(Task.created_at.desc())
+            .first()
+        )  # type: ignore[attr-defined]
         if recent:
             return recent
 
-        task = Task(
-            title=task_data.title,
-            description=task_data.description
-        )
+        task = Task(title=task_data.title, description=task_data.description)
         db.session.add(task)
         db.session.commit()
         return task
-    
+
     @staticmethod
     def update_task(task: Task, task_data: TaskUpdate) -> Task:
         """Update an existing task."""
@@ -55,7 +57,7 @@ class TaskService:
             setattr(task, key, value)
         db.session.commit()
         return task
-    
+
     @staticmethod
     def delete_task(task: Task) -> None:
         """Delete a task."""
