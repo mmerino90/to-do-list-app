@@ -44,7 +44,8 @@ jobs:
             --image gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.CLOUD_RUN_SERVICE }}:${{ github.sha }} \
             --platform managed \
             --region $CLOUD_RUN_REGION \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --set-env-vars DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}
 
       - name: Verify deployment
         run: |
