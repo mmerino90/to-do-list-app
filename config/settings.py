@@ -10,6 +10,19 @@ load_dotenv()
 # Base directory of the project (…/app/.. -> project root)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+def _normalize_db_url(raw: str | None) -> str | None:
+    """Normalize database URLs (handles postgres:// → postgresql+psycopg2://)."""
+    if not raw:
+        return None
+    url = raw
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+    if url.startswith("postgresql://") and "+psycopg2" not in url:
+        url = url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    return url
+
+
 class Config:
     """Base configuration."""
     # Flask
@@ -20,19 +33,29 @@ class Config:
     # Logging
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
 
+    # Database (unified)
+    SQLALCHEMY_DATABASE_URI = _normalize_db_url(
+        os.getenv("SQLALCHEMY_DATABASE_URI") or os.getenv("DATABASE_URL")
+    )
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
     @staticmethod
     def init_app(app: Any) -> None:
         """Hook for env-specific setup."""
-        # Nothing for base; subclasses may extend.
         pass
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
     LOG_LEVEL = "DEBUG"
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URL", 
-        f"postgresql://postgres:{os.getenv('POSTGRES_PASSWORD', 'your_password')}@localhost:5432/todo"
+    SQLALCHEMY_DATABASE_URI = _normalize_db_url(
+        os.getenv(
+            "SQLALCHEMY_DATABASE_URI",
+            os.getenv(
+                "DATABASE_URL",
+                f"postgresql+psycopg2://postgres:{os.getenv('POSTGRES_PASSWORD', 'your_password')}@localhost:5432/todo",
+            ),
+        )
     )
 
 
@@ -65,7 +88,6 @@ class ProductionConfig(Config):
         ))
         file_handler.setLevel(logging.INFO)
 
-        # Avoid duplicate handlers if reloading
         attached = any(isinstance(h, RotatingFileHandler) for h in app.logger.handlers)
         if not attached:
             app.logger.addHandler(file_handler)
