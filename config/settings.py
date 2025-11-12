@@ -55,9 +55,7 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
-    # Load URI from environment variables
-    SQLALCHEMY_DATABASE_URI = _get_database_uri()
-
+    # Database URI will be set dynamically in __init__.py to ensure env vars are loaded
     # Optionally harden the pool (prevents timeouts)
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,
