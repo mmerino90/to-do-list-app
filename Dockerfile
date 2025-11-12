@@ -23,9 +23,7 @@ COPY . /app
 # Cloud Run expects the server to listen on $PORT; default to 8080 for local runs
 ENV PORT=8080
 
-# Choose your app entrypoint:
-# If your Flask app exposes `app = Flask(__name__)` in app/__init__.py, use APP_MODULE=app:app
-# If you have a factory `create_app()`, set APP_MODULE='app:create_app()'
+# Module to run
 ENV APP_MODULE=app:create_app()
 
 

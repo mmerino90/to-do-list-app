@@ -1,61 +1,50 @@
 """Application configuration module."""
 import os
 from pathlib import Path
-from typing import Any, Dict  
+from typing import Any, Dict
 from dotenv import load_dotenv
 
-# Load environment variables from .env file (ignored in production if not present)
 load_dotenv()
 
-# Base directory of the project (…/app/.. -> project root)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-def _normalize_db_url(raw: str | None) -> str | None:
-    """Normalize database URLs (handles postgres:// → postgresql+psycopg2://)."""
-    if not raw:
-        return None
-    url = raw
-    if url.startswith("postgres://"):
-        url = url.replace("postgres://", "postgresql://", 1)
-    if url.startswith("postgresql://") and "+psycopg2" not in url:
+def _get_database_uri() -> str:
+    """
+    Normalize the database URL:
+    - Use SQLALCHEMY_DATABASE_URI if it exists
+    - Otherwise use DATABASE_URL
+    - Adjust postgresql scheme to postgresql+psycopg2 if needed
+    """
+    url = os.getenv("SQLALCHEMY_DATABASE_URI") or os.getenv("DATABASE_URL", "")
+    if not url:
+        return ""
+    if url.startswith("postgresql://"):
         url = url.replace("postgresql://", "postgresql+psycopg2://", 1)
     return url
 
 
 class Config:
-    """Base configuration."""
-    # Flask
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key")
     DEBUG: bool = False
     TESTING: bool = False
 
+    # Flask-SQLAlchemy
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
     # Logging
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
 
-    # Database (unified)
-    SQLALCHEMY_DATABASE_URI = _normalize_db_url(
-        os.getenv("SQLALCHEMY_DATABASE_URI") or os.getenv("DATABASE_URL")
-    )
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-
     @staticmethod
     def init_app(app: Any) -> None:
-        """Hook for env-specific setup."""
         pass
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
     LOG_LEVEL = "DEBUG"
-    SQLALCHEMY_DATABASE_URI = _normalize_db_url(
-        os.getenv(
-            "SQLALCHEMY_DATABASE_URI",
-            os.getenv(
-                "DATABASE_URL",
-                f"postgresql+psycopg2://postgres:{os.getenv('POSTGRES_PASSWORD', 'your_password')}@localhost:5432/todo",
-            ),
-        )
+    SQLALCHEMY_DATABASE_URI = _get_database_uri() or (
+        f"postgresql+psycopg2://postgres:{os.getenv('POSTGRES_PASSWORD', 'your_password')}@localhost:5432/todo"
     )
 
 
@@ -66,21 +55,28 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
+    # Load URI from environment variables
+    SQLALCHEMY_DATABASE_URI = _get_database_uri()
+
+    # Optionally harden the pool (prevents timeouts)
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+    }
+
     @classmethod
     def init_app(cls, app: Any) -> None:
-        """Production-specific initialization."""
         super(ProductionConfig, cls).init_app(app)
 
         import logging
         from logging.handlers import RotatingFileHandler
 
-        # Absolute logs dir under project root; safe even if it exists
         logs_dir = (BASE_DIR / "logs")
         logs_dir.mkdir(parents=True, exist_ok=True)
 
         file_handler = RotatingFileHandler(
             logs_dir / "todo.log",
-            maxBytes=10 * 1024 * 1024,  # 10 MB
+            maxBytes=10 * 1024 * 1024,
             backupCount=10,
         )
         file_handler.setFormatter(logging.Formatter(
@@ -88,8 +84,7 @@ class ProductionConfig(Config):
         ))
         file_handler.setLevel(logging.INFO)
 
-        attached = any(isinstance(h, RotatingFileHandler) for h in app.logger.handlers)
-        if not attached:
+        if not any(isinstance(h, RotatingFileHandler) for h in app.logger.handlers):
             app.logger.addHandler(file_handler)
 
         app.logger.setLevel(logging.INFO)

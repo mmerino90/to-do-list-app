@@ -7,11 +7,7 @@ __pycache__
 coverage.xml
 .git
 .gitignore
-.dist
-.build
 .idea
 .vscode
 .env
 .env.*
-Dockerfile
-docker-compose.yml

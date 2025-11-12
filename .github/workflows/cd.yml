@@ -41,11 +41,13 @@ jobs:
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy $CLOUD_RUN_SERVICE \
-            --image gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.CLOUD_RUN_SERVICE }}:${{ github.sha }} \
-            --platform managed \
-            --region $CLOUD_RUN_REGION \
-            --allow-unauthenticated \
-            --set-env-vars DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}
+          --image gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.CLOUD_RUN_SERVICE }}:${{ github.sha }} \
+          --platform managed \
+          --region $CLOUD_RUN_REGION \
+          --allow-unauthenticated \
+          --set-env-vars DATABASE_URL=${{ secrets.PROD_DATABASE_URL }} \
+          --add-cloudsql-instances github-actions-deployer-478018:us-central1:todo-postgres
+
 
       - name: Verify deployment
         run: |
