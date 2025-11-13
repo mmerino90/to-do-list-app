@@ -2,8 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
-.mypy_cache
-.pytest_cache
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
 app/__pycache__
 app/api/__pycache__
 app/models/__pycache__
