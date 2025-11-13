@@ -5,7 +5,7 @@
 **Status**: ✅ Production-Ready | **Coverage**: 82.75% (Target: 70%) | **Tests**: 10/10 passing  
 **Live**: https://github-actions-deployer-570395440561.us-central1.run.app/  
 **Repository**: https://github.com/mmerino90/to-do-list-app  
-**Last Updated**: November 13, 2025
+**Last Updated**: November 13, 2025 - Service redeployed with correct secret
 
 ---
 
