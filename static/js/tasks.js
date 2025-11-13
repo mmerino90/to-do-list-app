@@ -18,7 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await fetch(apiBase);
       if (!res.ok) throw new Error(`Failed to load tasks: ${res.status}`);
-      const tasks = await res.json();
+      const response = await res.json();
+      // Extract tasks from response wrapper
+      const tasks = response.data || response || [];
       renderTasks(tasks);
     } catch (err) {
       showError(err.message);
