@@ -26,8 +26,11 @@ todo.db
 # Flask instance
 instance/
 
-# Environment
+# Environment (never commit actual .env files - always use .env.example)
 .env
+.env.*
+!.env.example
+!.env.test.example
 
 # Logs
 logs/
