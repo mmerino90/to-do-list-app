@@ -65,7 +65,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "sum(rate(todo_api_request_count[5m]))",
+          "expr": "sum(rate(todo_api_request_count_total[5m]))",
           "refId": "A"
         }
       ],
@@ -123,7 +123,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "sum(rate(todo_api_error_count[5m])) / sum(rate(todo_api_request_count[5m]))",
+          "expr": "sum(rate(todo_api_error_count_total[5m])) / sum(rate(todo_api_request_count_total[5m]))",
           "refId": "A"
         }
       ],
@@ -259,7 +259,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(todo_api_request_count[5m])) by (endpoint)",
+          "expr": "sum(rate(todo_api_request_count_total[5m])) by (endpoint)",
           "legendFormat": "{{endpoint}}",
           "refId": "A"
         }
@@ -335,7 +335,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(todo_api_error_count[5m])) by (endpoint) / sum(rate(todo_api_request_count[5m])) by (endpoint)",
+          "expr": "sum(rate(todo_api_error_count_total[5m])) by (endpoint) / sum(rate(todo_api_request_count_total[5m])) by (endpoint)",
           "legendFormat": "{{endpoint}}",
           "refId": "A"
         }
@@ -410,7 +410,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(todo_api_request_count[5m])) by (http_status)",
+          "expr": "sum(rate(todo_api_request_count_total[5m])) by (http_status)",
           "legendFormat": "{{http_status}}",
           "refId": "A"
         }
