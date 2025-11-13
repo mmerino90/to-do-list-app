@@ -4,12 +4,17 @@ from datetime import datetime, timedelta
 from app.extensions import db
 from app.models.task import Task
 from app.schemas.task import TaskCreate, TaskUpdate
+from app.utils.constants import DUPLICATE_CHECK_WINDOW_SECONDS
 
 
 class TaskService:
-    """Service for handling task operations."""
-
-    DEDUP_WINDOW_SECONDS = 2  # seconds
+    """Service for handling task operations.
+    
+    Implements single responsibility principle:
+    - Handles all business logic for task management
+    - Abstracts database operations
+    - No HTTP concerns (status codes, responses, etc.)
+    """
 
     @staticmethod
     def get_all_tasks() -> List[Task]:
@@ -27,12 +32,40 @@ class TaskService:
 
     @staticmethod
     def create_task(task_data: TaskCreate) -> Task:
-        """Create a new task."""
-        # Simple deduplication: if an identical task (title+description) was created
-        # in the last DEDUP_WINDOW_SECONDS, return it instead of creating a duplicate. This
-        # guards against accidental duplicate requests from clients.
+        """Create a new task with deduplication check.
+        
+        Prevents duplicate tasks from being created if an identical
+        task (same title and description) was created within the
+        deduplication window.
+        
+        Args:
+            task_data: Task creation data
+            
+        Returns:
+            Created or existing task
+        """
+        # Check for duplicates within the deduplication window
+        recent_duplicate = TaskService._find_recent_duplicate(task_data)
+        if recent_duplicate:
+            return recent_duplicate
+
+        task = Task(title=task_data.title, description=task_data.description)
+        db.session.add(task)
+        db.session.commit()
+        return task
+
+    @staticmethod
+    def _find_recent_duplicate(task_data: TaskCreate) -> Optional[Task]:
+        """Find a recently created task matching the given data.
+        
+        Args:
+            task_data: Task data to match
+            
+        Returns:
+            Matching task if found within deduplication window, None otherwise
+        """
         now = datetime.utcnow()
-        window_start = now - timedelta(seconds=TaskService.DEDUP_WINDOW_SECONDS)
+        window_start = now - timedelta(seconds=DUPLICATE_CHECK_WINDOW_SECONDS)
         recent = (
             Task.query.filter(
                 Task.title == task_data.title,
@@ -42,13 +75,7 @@ class TaskService:
             .order_by(Task.created_at.desc())
             .first()
         )  # type: ignore[attr-defined]
-        if recent:
-            return recent
-
-        task = Task(title=task_data.title, description=task_data.description)
-        db.session.add(task)
-        db.session.commit()
-        return task
+        return recent
 
     @staticmethod
     def update_task(task: Task, task_data: TaskUpdate) -> Task:
