@@ -9,44 +9,150 @@
 
 ---
 
-## 🚀 Quick Start
+## 🆕 New to This Project?
 
-### Local Development (Windows PowerShell)
+**👉 [Start with SETUP.md](./SETUP.md)** - Complete beginner-friendly guide with screenshots and troubleshooting!
+
+---
+
+## 🚀 Quick Start for New Users
+
+### Prerequisites
+- **Python 3.11+** ([Download here](https://www.python.org/downloads/))
+- **Docker Desktop** (optional, for full stack) ([Download here](https://www.docker.com/products/docker-desktop/))
+- **Git** ([Download here](https://git-scm.com/downloads))
+
+---
+
+### Option A: Simple Local Development (Flask Only - No Database Setup)
+
+Perfect for trying out the app quickly! Uses SQLite (no PostgreSQL needed).
 
 ```powershell
-# Clone repository
+# 1. Clone repository
 git clone https://github.com/mmerino90/to-do-list-app.git
 cd to-do-list-app
 
-# Setup
-python -m venv .\venv
+# 2. Create virtual environment
+python -m venv venv
+
+# 3. Activate virtual environment
+# Windows PowerShell:
 .\venv\Scripts\Activate.ps1
+# Windows CMD:
+# venv\Scripts\activate.bat
+# Linux/Mac:
+# source venv/bin/activate
+
+# 4. Install dependencies
 pip install -r requirements.txt
 
-# Run application
+# 5. Run application (uses SQLite, no setup needed!)
 python run.py
 
-# Visit: http://127.0.0.1:5000/
+# 6. Visit: http://127.0.0.1:8080
 ```
+
+✅ **That's it!** The app runs with SQLite (auto-created). No database configuration needed.
 
 ### Run Tests
 ```powershell
+# Make sure virtual environment is activated first
 pytest --cov=app --cov-report=term-missing
 ```
 
-### Run with Docker Compose (Full Stack)
+---
+
+### Option B: Full Stack with Docker Compose (PostgreSQL + Monitoring)
+
+Get the complete production-like setup with PostgreSQL, Prometheus, and Grafana!
+
+**Step 1: Clone Repository**
 ```powershell
-# Start all services (Flask + PostgreSQL + Prometheus + Grafana)
+git clone https://github.com/mmerino90/to-do-list-app.git
+cd to-do-list-app
+```
+
+**Step 2: Create .env File**
+```powershell
+# Copy the template
+cp .env.example .env
+
+# Windows PowerShell:
+Copy-Item .env.example .env
+```
+
+**Step 3: Edit .env File**
+
+Open `.env` in any text editor and replace `your_secure_password_here` with your own password:
+
+```dotenv
+POSTGRES_PASSWORD=MySecurePassword123!   # ← Change this!
+DATABASE_URL=postgresql://postgres:MySecurePassword123!@db:5432/todo  # ← And this!
+```
+
+**Step 4: Start All Services**
+```powershell
 docker-compose up -d
+```
 
-# Access services:
-# • Flask App: http://localhost:8080
-# • Prometheus: http://localhost:9090
-# • Grafana: http://localhost:3000 (admin/admin)
+**Step 5: Wait for Services (30 seconds)**
 
-# Stop services
+Docker will download images and start services. Check status:
+```powershell
+docker-compose ps
+```
+
+Expected output:
+```
+NAME         SERVICE      STATUS
+grafana      grafana      Up
+prometheus   prometheus   Up
+to-do-db     db           Up (healthy)
+to-do-web    web          Up
+```
+
+**Step 6: Access Services**
+
+| Service | URL | Credentials |
+|---------|-----|-------------|
+| **Web App** | http://localhost:8080 | None |
+| **API Docs** | http://localhost:8080/api/v1/tasks | None |
+| **Prometheus** | http://localhost:9090 | None |
+| **Grafana** | http://localhost:3000 | admin / admin |
+
+**Step 7: Import Grafana Dashboard (Optional)**
+
+1. Open http://localhost:3000 (login: `admin` / `admin`)
+2. Click **Dashboards** → **Import**
+3. Click **Upload JSON file**
+4. Select `docs/grafana-dashboard.json`
+5. Click **Import**
+6. Dashboard shows 6 panels with real-time metrics!
+
+**Stop Services**
+```powershell
 docker-compose down
 ```
+
+---
+
+### Troubleshooting Setup Issues
+
+**Problem**: `python: command not found`  
+**Solution**: Install Python 3.11+ from [python.org](https://www.python.org/downloads/), check "Add to PATH" during installation
+
+**Problem**: `docker-compose: command not found`  
+**Solution**: Install Docker Desktop from [docker.com](https://www.docker.com/products/docker-desktop/)
+
+**Problem**: `.env` file not found error  
+**Solution**: Copy `.env.example` to `.env`: `Copy-Item .env.example .env` (Windows) or `cp .env.example .env` (Linux/Mac)
+
+**Problem**: Docker says "port 8080 already in use"  
+**Solution**: Stop other services using port 8080, or change port in `docker-compose.yml`
+
+**Problem**: `connection refused` to database  
+**Solution**: Make sure password in `.env` matches in both `POSTGRES_PASSWORD` and `DATABASE_URL`
 
 ### Deploy to Production
 ```powershell
@@ -80,7 +186,6 @@ All documentation has been organized in the [`/docs`](./docs) folder for clean r
 ### For Monitoring & Operations
 
 - **[docs/MONITORING.md](./docs/MONITORING.md)** — Comprehensive 790+ line monitoring guide
-- **[docs/MONITORING_DATA.md](./docs/MONITORING_DATA.md)** — All metrics and deliverables
 - **[docs/grafana-dashboard.json](./docs/grafana-dashboard.json)** — Pre-configured dashboard (6 panels)
 
 ### Configuration Files
@@ -171,51 +276,106 @@ All documentation has been organized in the [`/docs`](./docs) folder for clean r
 
 ## ⚙️ Environment Configuration
 
-### Security: Why .env is in .gitignore
+### 🔐 Understanding .env Files
 
-**The `.env` file contains sensitive information:**
-- Database credentials
-- API keys
-- Secret keys
-- Connection strings
+This project uses environment files to manage configuration:
 
-**These should NEVER be committed to version control**, even for a public repository.
+| File | Purpose | Contains Real Passwords? | In Git? |
+|------|---------|-------------------------|---------|
+| **`.env`** | Your local configuration | ✅ YES (your passwords) | ❌ NO (protected by .gitignore) |
+| **`.env.example`** | Template for others | ❌ NO (placeholders only) | ✅ YES (safe to share) |
+| **`.env.test.example`** | Test template | ❌ NO (test placeholders) | ✅ YES (safe to share) |
 
-**How it works**:
-1. `.env` is in `.gitignore` → Never committed to git
-2. `.env.example` is in repository → Shows what variables are needed
-3. For production: Use GitHub Secrets and Cloud Run environment variables
-4. For local development: Copy `.env.example` to `.env` and fill in YOUR values
+### 📝 Setup Your .env File
 
-**Local Setup**:
-```bash
-# Copy template
-cp .env.example .env
+**For Docker Compose users:**
 
-# Edit .env with your local values
-# (This file will never be committed)
+1. **Copy the template:**
+   ```powershell
+   # Windows PowerShell
+   Copy-Item .env.example .env
+   
+   # Linux/Mac
+   cp .env.example .env
+   ```
+
+2. **Edit `.env` and change the password:**
+   ```dotenv
+   FLASK_APP=run.py
+   FLASK_ENV=development
+   LOG_LEVEL=INFO
+   
+   # ⚠️ IMPORTANT: Change these passwords!
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=YourSecurePassword123!     # ← Change this!
+   POSTGRES_DB=todo
+   DATABASE_URL=postgresql://postgres:YourSecurePassword123!@db:5432/todo  # ← Match password here!
+   ```
+
+3. **Save the file** - Your `.env` stays on your computer only (never committed to git)
+
+**For Python-only users:**
+
+No setup needed! The app uses SQLite automatically. Just run `python run.py`.
+
+### 🔒 Security Model
+
+**What's in `.env.example` (safe to share):**
+```properties
+POSTGRES_PASSWORD=your_secure_password_here  # ← Placeholder text
 ```
 
-**Production Setup**:
-- GitHub Actions uses `secrets.PROD_DATABASE_URL`
-- Cloud Run environment variables set via secrets
-- No credentials in code or git history
-
-### Available Configuration
-
-**`.env.example`** (safe to commit - template only):
+**What's in YOUR `.env` (never share):**
 ```properties
+POSTGRES_PASSWORD=ActualPassword123!  # ← Your real password
+```
+
+**Protection:**
+- ✅ `.env` is in `.gitignore` → Git ignores it
+- ✅ Never appears in `git status`
+- ✅ Never gets committed or pushed
+- ✅ Each developer has their own `.env` with their own passwords
+
+### 📋 Template Files Reference
+
+**`.env.example`** - Main configuration template:
+```dotenv
 FLASK_APP=run.py
 FLASK_ENV=development
 LOG_LEVEL=INFO
+
+# PostgreSQL Database (for Docker Compose)
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_secure_password_here
+POSTGRES_DB=todo
+DATABASE_URL=postgresql://postgres:your_secure_password_here@db:5432/todo
 ```
 
-**`.env.test.example`** (safe to commit - test template):
-```properties
+**`.env.test.example`** - Testing configuration template:
+```dotenv
+# Test Database Configuration
 POSTGRES_USER=test_user
 POSTGRES_PASSWORD=test_password
+POSTGRES_DB=test_todo_db
 DATABASE_URL=postgresql://test_user:test_password@db:5432/test_todo_db
+
+# Flask Testing Configuration
+FLASK_ENV=testing
+FLASK_CONFIG=testing
+LOG_LEVEL=DEBUG
 ```
+
+### ⚠️ Common Mistakes to Avoid
+
+❌ **DON'T** commit `.env` to git  
+❌ **DON'T** share your `.env` file with others  
+❌ **DON'T** use production passwords in `.env.example`  
+❌ **DON'T** use the same password everywhere  
+
+✅ **DO** copy `.env.example` to `.env` and change the password  
+✅ **DO** keep `.env` on your local machine only  
+✅ **DO** use `.env.example` as a template  
+✅ **DO** use GitHub Secrets for production deployments
 
 ---
 
