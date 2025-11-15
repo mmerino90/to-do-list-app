@@ -43,8 +43,9 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     LOG_LEVEL = "DEBUG"
+    # Use DATABASE_URL if set (for Docker/PostgreSQL), otherwise use SQLite (for local development)
     SQLALCHEMY_DATABASE_URI = _get_database_uri() or (
-        f"postgresql+psycopg2://postgres:{os.getenv('POSTGRES_PASSWORD', 'your_password')}@localhost:5432/todo"
+        f"sqlite:///{BASE_DIR / 'instance' / 'todo.db'}"
     )
 
 
