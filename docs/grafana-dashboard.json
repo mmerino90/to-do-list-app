@@ -118,8 +118,8 @@
         "title": "Error Rate",
         "targets": [
           {
-            "expr": "rate(todo_api_errors_total[5m])",
-            "legendFormat": "{{method}} {{endpoint}} - {{error_type}}",
+            "expr": "rate(todo_api_error_count_total[5m])",
+            "legendFormat": "{{method}} {{endpoint}} - {{http_status}}",
             "refId": "A"
           }
         ],
@@ -159,7 +159,7 @@
         "title": "Response Time (p95)",
         "targets": [
           {
-            "expr": "histogram_quantile(0.95, rate(todo_api_request_duration_seconds_bucket[5m]))",
+            "expr": "histogram_quantile(0.95, rate(todo_api_request_latency_seconds_bucket[5m]))",
             "legendFormat": "{{method}} {{endpoint}}",
             "refId": "A"
           }
@@ -216,7 +216,7 @@
         "title": "Average Response Time",
         "targets": [
           {
-            "expr": "rate(todo_api_request_duration_seconds_sum[5m]) / rate(todo_api_request_duration_seconds_count[5m])",
+            "expr": "rate(todo_api_request_latency_seconds_sum[5m]) / rate(todo_api_request_latency_seconds_count[5m])",
             "legendFormat": "{{method}} {{endpoint}}",
             "refId": "A"
           }
@@ -244,51 +244,14 @@
           }
         }
       },
+
       {
         "id": 6,
         "gridPos": {
           "h": 8,
-          "w": 12,
-          "x": 12,
-          "y": 16
-        },
-        "type": "piechart",
-        "title": "Task Status Distribution",
-        "targets": [
-          {
-            "expr": "todo_tasks_total",
-            "legendFormat": "{{status}}",
-            "refId": "A"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "unit": "short"
-          }
-        },
-        "options": {
-          "legend": {
-            "displayMode": "list",
-            "placement": "bottom",
-            "values": ["value", "percent"]
-          },
-          "pieType": "pie",
-          "tooltip": {
-            "mode": "single"
-          },
-          "displayLabels": ["percent"]
-        }
-      },
-      {
-        "id": 7,
-        "gridPos": {
-          "h": 8,
           "w": 24,
           "x": 0,
-          "y": 24
+          "y": 16
         },
         "type": "bargauge",
         "title": "Requests by Endpoint",
