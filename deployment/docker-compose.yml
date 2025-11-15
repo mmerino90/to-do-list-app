@@ -2,7 +2,7 @@ services:
   db:
     image: postgres:16
     env_file:
-      - .env
+      - ../.env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -18,12 +18,12 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   web:
-    build: .
+    build: ..
     depends_on:
       db:
         condition: service_healthy
     env_file:
-      - .env
+      - ../.env
     environment:
       PORT: "8080"
       APP_MODULE: app:create_app()

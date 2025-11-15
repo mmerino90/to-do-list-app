@@ -182,6 +182,7 @@ Save and close the file.
 ### Step 5: Start All Services
 
 ```powershell
+cd deployment
 docker-compose up -d
 ```
 
@@ -249,12 +250,14 @@ Refresh the Grafana dashboard to see the data!
 
 ```powershell
 docker-compose down
+cd ..
 ```
 
 This stops and removes all containers. Your data is preserved in Docker volumes.
 
 **To start again:**
 ```powershell
+cd deployment
 docker-compose up -d
 ```
 
@@ -298,6 +301,7 @@ ports:
 **Solution**: 
 ```powershell
 # Stop everything
+cd deployment
 docker-compose down
 
 # Remove old volumes (⚠️ deletes data!)

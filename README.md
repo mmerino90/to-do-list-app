@@ -132,7 +132,9 @@ to-do-web    web          Up
 
 **Stop Services**
 ```powershell
+cd deployment
 docker-compose down
+cd ..
 ```
 
 ---
@@ -173,6 +175,8 @@ All documentation has been organized in the [`/docs`](./docs) folder for clean r
 
 | Document | Purpose | Read Time |
 |----------|---------|-----------|
+| **[SETUP.md](./SETUP.md)** 🆕 | Beginner-friendly setup guide | 5 min |
+| **[PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)** 🆕 | Repository organization explained | 5 min |
 | **[REPORT.md](./docs/REPORT.md)** ⭐ | Comprehensive project report | 15 min |
 | **[FINAL_PROJECT_REPORT.md](./docs/FINAL_PROJECT_REPORT.md)** | Detailed 5-6 page technical report | 20 min |
 | **[MINIMAL_MONITORING_SETUP.md](./docs/MINIMAL_MONITORING_SETUP.md)** | Quick monitoring setup (5 min) | 5 min |
@@ -190,9 +194,10 @@ All documentation has been organized in the [`/docs`](./docs) folder for clean r
 
 ### Configuration Files
 
-- **[prometheus.yml](./prometheus.yml)** — Prometheus scrape configuration
-- **[docker-compose.yml](./docker-compose.yml)** — Full stack definition
-- **[.github/workflows/](./github/workflows/)** — CI/CD pipeline definitions
+- **[deployment/](./deployment/)** — Deployment configs (Docker, Prometheus, etc.)
+- **[scripts/](./scripts/)** — Utility scripts for automation
+- **[.github/workflows/](./.github/workflows/)** — CI/CD pipeline definitions
+- **[config/examples/](./config/examples/)** — Optional/reference configurations
 
 ---
 
@@ -443,6 +448,7 @@ Download from [docker.com](https://www.docker.com/products/docker-desktop/)
 
 **2. Start All Services**
 ```powershell
+cd deployment
 docker-compose up -d
 ```
 
@@ -484,6 +490,7 @@ to-do-web         web          Up
 **6. Stop Services**
 ```powershell
 docker-compose down
+cd ..
 ```
 
 **Need help?** See [`docs/MINIMAL_MONITORING_SETUP.md`](./docs/MINIMAL_MONITORING_SETUP.md)
@@ -745,7 +752,8 @@ done
 
 Dashboard auto-refreshes every 5 seconds with new data.
 
-**Setup Guide**: [`docs/MINIMAL_MONITORING_SETUP.md`](./docs/MINIMAL_MONITORING_SETUP.md)
+**Setup Guide**: [`docs/MINIMAL_MONITORING_SETUP.md`](./docs/MINIMAL_MONITORING_SETUP.md)  
+**Project Structure**: [`PROJECT_STRUCTURE.md`](./PROJECT_STRUCTURE.md)
 
 ---
 
