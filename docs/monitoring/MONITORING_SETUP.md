@@ -418,26 +418,6 @@ Consider these hosted alternatives (no local setup needed):
 
 ---
 
-## Screenshots
-
-The following screenshots show what you should see at each step:
-
-### 1. Prometheus Targets (Step 2)
-![Prometheus showing Flask app target as UP](./screenshots/prometheus-targets.png)
-
-### 2. Grafana Data Source Configuration (Step 4)
-![Grafana data source configuration screen](./screenshots/grafana-datasource.png)
-
-### 3. Grafana Dashboard Import (Step 5)
-![Grafana dashboard import screen](./screenshots/grafana-import.png)
-
-### 4. Complete Dashboard (Final Result)
-![Full Grafana dashboard with 7 panels showing metrics](./screenshots/grafana-dashboard.png)
-
-**Note**: Screenshots are for reference. Your actual dashboard will show real data from your application.
-
----
-
 ## Quick Reference Card
 
 ```
@@ -457,10 +437,3 @@ The following screenshots show what you should see at each step:
 │ • Metrics wrong? Check _total suffix in queries          │
 └──────────────────────────────────────────────────────────┘
 ```
-
----
-
-**Questions?** See detailed guides:
-- `docs/MONITORING.md` - Complete 790+ line guide
-- `docs/GRAFANA_MANUAL.md` - Step-by-step with explanations
-- `docs/MONITORING_DATA.md` - All metrics documentation

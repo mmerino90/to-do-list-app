@@ -167,10 +167,6 @@ git push origin main
 
 ---
 
-## 📚 Documentation
-
-All documentation has been organized in the [`/docs`](./docs) folder for clean repository structure.
-
 ### 📋 Main Report
 
 **[PROJECT_REPORT.md](./docs/PROJECT_REPORT.md)** - Complete project report covering improvements, architecture, CI/CD, monitoring, testing, deployment, challenges, and results.
@@ -469,8 +465,6 @@ docker-compose down
 cd ..
 ```
 
-**Need help?** See [`docs/MINIMAL_MONITORING_SETUP.md`](./docs/MINIMAL_MONITORING_SETUP.md)
-
 ---
 
 ## 📝 Running Tests
@@ -665,7 +659,6 @@ Visit the URL to see your live application!
 **Problem**: "Service timeout"  
 **Solution**: Increase Cloud Run timeout: `--timeout=60s` in deploy command
 
-**More help**: See [`docs/GCP_IAM_SETUP.md`](./docs/GCP_IAM_SETUP.md) and [`docs/PROJECT_REPORT.md`](./docs/PROJECT_REPORT.md)
 
 ---
 

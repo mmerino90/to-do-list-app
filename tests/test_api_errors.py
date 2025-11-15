@@ -4,7 +4,7 @@ from app import create_app  # noqa: F401
 def test_health_endpoint(client):
     response = client.get("/api/v1/health")
     assert response.status_code == 200
-    assert response.json == {"status": "healthy"}
+    assert response.json["data"] == {"status": "healthy"}
 
 
 def test_metrics_endpoint(client):

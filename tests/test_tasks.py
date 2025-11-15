@@ -8,8 +8,8 @@ def test_create_task(client, db):
         "/api/v1/tasks", json={"title": "Test Task", "description": "Test Description"}
     )
     assert response.status_code == 201
-    assert response.json["title"] == "Test Task"
-    assert response.json["description"] == "Test Description"
+    assert response.json["data"]["title"] == "Test Task"
+    assert response.json["data"]["description"] == "Test Description"
 
 
 def test_get_tasks(client, db, app):
@@ -22,8 +22,8 @@ def test_get_tasks(client, db, app):
 
         response = client.get("/api/v1/tasks")
         assert response.status_code == 200
-        assert len(response.json) == 1
-        assert response.json[0]["title"] == "Test Task"
+        assert len(response.json["data"]) == 1
+        assert response.json["data"][0]["title"] == "Test Task"
 
 
 def test_delete_task(client, db, app):
@@ -56,5 +56,5 @@ def test_update_task(client, db, app):
             json={"title": "Updated Task", "completed": True},
         )
         assert response.status_code == 200
-        assert response.json["title"] == "Updated Task"
-        assert response.json["completed"] is True
+        assert response.json["data"]["title"] == "Updated Task"
+        assert response.json["data"]["completed"] is True
