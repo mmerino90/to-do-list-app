@@ -62,7 +62,7 @@ You should see all services with status "Up".
 2. You should see:
    ```
    State: UP
-   Endpoint: http://flask_app:8080/metrics
+   Endpoint: http://web:8080/api/v1/metrics
    ```
 
 3. Click on "Graph" tab
@@ -226,13 +226,14 @@ global:
   scrape_interval: 15s      # Scrape metrics every 15 seconds
 
 scrape_configs:
-  - job_name: 'flask_app'
+  - job_name: 'to-do-list-app'
     static_configs:
-      - targets: ['flask_app:8080']  # Scrape Flask /metrics endpoint
+      - targets: ['web:8080']
+    metrics_path: '/api/v1/metrics'
 ```
 
 **What this does**:
-- Every 15 seconds, Prometheus fetches metrics from Flask app
+- Every 15 seconds, Prometheus fetches metrics from Flask app at `/api/v1/metrics`
 - Metrics stored in time-series database
 - Queryable via PromQL (Prometheus Query Language)
 
@@ -282,15 +283,17 @@ REQUEST_DURATION = Histogram(
     ['method', 'endpoint']
 )
 
-@app.route('/metrics')
+@bp.route('/metrics', methods=['GET'])
 def metrics():
     """Expose metrics in Prometheus format"""
     return generate_latest(), 200, {'Content-Type': 'text/plain; charset=utf-8'}
+
+# Note: Blueprint has url_prefix='/api/v1', so full path is /api/v1/metrics
 ```
 
 **What this does**:
 - Defines custom metrics (request count, duration, etc.)
-- Exposes them at `/metrics` endpoint in Prometheus format
+- Exposes them at `/api/v1/metrics` endpoint in Prometheus format
 - Prometheus scrapes this endpoint every 15 seconds
 
 ---
@@ -307,7 +310,7 @@ Your application exposes these metrics:
 | `todo_tasks_total` | Gauge | Current task count by status | `todo_tasks_total{status="pending"}` |
 
 **View Raw Metrics**:
-Visit http://localhost:8080/metrics to see the raw Prometheus format:
+Visit http://localhost:8080/api/v1/metrics to see the raw Prometheus format:
 
 ```
 # HELP todo_api_request_count_total Total API requests

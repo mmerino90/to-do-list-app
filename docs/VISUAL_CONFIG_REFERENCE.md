@@ -38,11 +38,11 @@ scrape_configs:
       # List of endpoints to scrape
       - targets: 
           # Format: hostname:port
-          # 'flask_app' is Docker service name from docker-compose.yml
-          - 'flask_app:8080'
+          # 'web' is Docker service name from docker-compose.yml
+          - 'web:8080'
     
-    # Optional: Path to scrape (defaults to /metrics)
-    metrics_path: '/metrics'
+    # Path to scrape (custom path for this app)
+    metrics_path: '/api/v1/metrics'
     
     # Optional: Scheme (defaults to http)
     scheme: 'http'
@@ -63,15 +63,15 @@ scrape_configs:
 │                                                             │
 │  Scrape Jobs:                                               │
 │  ┌─────────────────────────────────────────────────────┐  │
-│  │ Job: flask_app                                      │  │
-│  │   ├─ Target: flask_app:8080                        │  │
-│  │   ├─ Path: /metrics                                │  │
+│  │ Job: to-do-list-app                                 │  │
+│  │   ├─ Target: web:8080                              │  │
+│  │   ├─ Path: /api/v1/metrics                         │  │
 │  │   ├─ Scheme: http                                  │  │
 │  │   └─ Result: Collects all exposed metrics          │  │
 │  └─────────────────────────────────────────────────────┘  │
 │                                                             │
 │  Every 15 seconds:                                          │
-│  Prometheus → http://flask_app:8080/metrics → Store data   │
+│  Prometheus → http://web:8080/api/v1/metrics → Store data  │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -80,7 +80,7 @@ scrape_configs:
 
 **Step-by-Step**:
 1. **Every 15 seconds**: Prometheus timer triggers
-2. **Sends HTTP GET**: `GET http://flask_app:8080/metrics`
+2. **Sends HTTP GET**: `GET http://web:8080/api/v1/metrics`
 3. **Receives Response**: Text format with all metrics
 4. **Parses Metrics**: Extracts metric names, values, labels
 5. **Stores in Database**: Time-series database with timestamp
@@ -88,8 +88,8 @@ scrape_configs:
 
 **Example Scrape Request**:
 ```http
-GET /metrics HTTP/1.1
-Host: flask_app:8080
+GET /api/v1/metrics HTTP/1.1
+Host: web:8080
 User-Agent: Prometheus/2.47.0
 Accept: application/openmetrics-text; version=1.0.0
 ```
@@ -187,14 +187,14 @@ services:
     networks:
       - monitoring
 
-  # ====== FLASK APP SERVICE (FOR REFERENCE) ======
-  flask_app:
+  # ====== WEB SERVICE (FLASK APP) ======
+  web:
     build: .
-    container_name: flask_app
+    container_name: web
     ports:
       - "8080:8080"
     environment:
-      - SQLALCHEMY_DATABASE_URI=postgresql://user:password@db:5432/todo_db
+      - DATABASE_URL=postgresql://user:password@db:5432/todo_db
     depends_on:
       - db
     networks:
@@ -218,12 +218,13 @@ Docker Network: monitoring
 │                                                             │
 │  ┌──────────────────┐                                      │
 │  │   Flask App      │                                      │
+│  │   (web)          │                                      │
 │  │   Port: 8080     │                                      │
 │  │   Exposes:       │                                      │
-│  │   /metrics       │                                      │
+│  │   /api/v1/metrics│                                      │
 │  └────────┬─────────┘                                      │
 │           │                                                 │
-│           │ HTTP GET /metrics (every 15s)                  │
+│           │ HTTP GET /api/v1/metrics (every 15s)           │
 │           ▼                                                 │
 │  ┌──────────────────┐                                      │
 │  │   Prometheus     │                                      │
@@ -668,7 +669,7 @@ The dashboard JSON is large (~500 lines), but here's the structure:
 │     └─────────────────────────────────────────────────────────┘    │
 │                                                                      │
 │     Actions:                                                         │
-│     1. HTTP GET http://flask_app:8080/metrics                       │
+│     1. HTTP GET http://web:8080/api/v1/metrics                      │
 │     2. Parse response (metric names, values, labels)                │
 │     3. Store in time-series database with timestamp                 │
 │     4. Repeat every 15 seconds                                      │
@@ -756,8 +757,8 @@ The dashboard JSON is large (~500 lines), but here's the structure:
 │       └─► Flask processes (45ms)                                  │
 │       └─► Metrics updated                                         │
 │                                                                    │
-│ T+15s: Prometheus scrapes /metrics                                │
-│       └─► HTTP GET http://flask_app:8080/metrics                  │
+│ T+15s: Prometheus scrapes /api/v1/metrics                         │
+│       └─► HTTP GET http://web:8080/api/v1/metrics                 │
 │       └─► Receives: request_count=2, duration_bucket[0.05]=2      │
 │       └─► Stores in database with timestamp: 2024-01-15 12:00:15 │
 │                                                                    │
@@ -783,19 +784,19 @@ The dashboard JSON is large (~500 lines), but here's the structure:
 **Configuration Files**:
 1. ✅ `prometheus.yml` - What to monitor, how often (15s interval)
 2. ✅ `docker-compose.yml` - Service definitions, networking, ports
-3. ✅ `app/__init__.py` - Metrics instrumentation in Flask
+3. ✅ `app/api/tasks.py` - Metrics instrumentation in Flask
 4. ✅ `docs/grafana-dashboard.json` - Pre-configured visualizations
 
 **Data Flow**:
 ```
-User Request → Flask (record metrics) → /metrics endpoint →
+User Request → Flask (record metrics) → /api/v1/metrics endpoint →
 Prometheus (scrape every 15s) → Time-series DB →
 Grafana (query via PromQL) → Dashboard (visualize)
 ```
 
 **Access Points**:
 - Flask App: http://localhost:8080
-- Raw Metrics: http://localhost:8080/metrics
+- Raw Metrics: http://localhost:8080/api/v1/metrics
 - Prometheus: http://localhost:9090
 - Grafana: http://localhost:3000
 
