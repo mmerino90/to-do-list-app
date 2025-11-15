@@ -171,33 +171,9 @@ git push origin main
 
 All documentation has been organized in the [`/docs`](./docs) folder for clean repository structure.
 
-### Getting Started
+### 📋 Main Report
 
-| Document | Purpose | Read Time |
-|----------|---------|-----------|
-| **[SETUP.md](./SETUP.md)** 🆕 | Beginner-friendly setup guide | 5 min |
-| **[PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)** 🆕 | Repository organization explained | 5 min |
-| **[REPORT.md](./docs/REPORT.md)** ⭐ | Comprehensive project report | 15 min |
-| **[FINAL_PROJECT_REPORT.md](./docs/FINAL_PROJECT_REPORT.md)** | Detailed 5-6 page technical report | 20 min |
-| **[MINIMAL_MONITORING_SETUP.md](./docs/MINIMAL_MONITORING_SETUP.md)** | Quick monitoring setup (5 min) | 5 min |
-
-### For Developers
-
-- **[docs/MINIMAL_MONITORING_SETUP.md](./docs/MINIMAL_MONITORING_SETUP.md)** — 5-minute Prometheus + Grafana setup
-- **[docs/VISUAL_CONFIG_REFERENCE.md](./docs/VISUAL_CONFIG_REFERENCE.md)** — Complete monitoring configuration guide
-- **[docs/CODE_REFACTORING.md](./docs/CODE_REFACTORING.md)** — SOLID principles and improvements
-
-### For Monitoring & Operations
-
-- **[docs/MONITORING.md](./docs/MONITORING.md)** — Comprehensive 790+ line monitoring guide
-- **[docs/grafana-dashboard.json](./docs/grafana-dashboard.json)** — Pre-configured dashboard (6 panels)
-
-### Configuration Files
-
-- **[deployment/](./deployment/)** — Deployment configs (Docker, Prometheus, etc.)
-- **[scripts/](./scripts/)** — Utility scripts for automation
-- **[.github/workflows/](./.github/workflows/)** — CI/CD pipeline definitions
-- **[config/examples/](./config/examples/)** — Optional/reference configurations
+**[PROJECT_REPORT.md](./docs/PROJECT_REPORT.md)** - Complete project report covering improvements, architecture, CI/CD, monitoring, testing, deployment, challenges, and results.
 
 ---
 
@@ -689,7 +665,7 @@ Visit the URL to see your live application!
 **Problem**: "Service timeout"  
 **Solution**: Increase Cloud Run timeout: `--timeout=60s` in deploy command
 
-**More help**: See [`docs/GCP_IAM_SETUP.md`](./docs/GCP_IAM_SETUP.md) and [`docs/FINAL_PROJECT_REPORT.md`](./docs/FINAL_PROJECT_REPORT.md)
+**More help**: See [`docs/GCP_IAM_SETUP.md`](./docs/GCP_IAM_SETUP.md) and [`docs/PROJECT_REPORT.md`](./docs/PROJECT_REPORT.md)
 
 ---
 
@@ -750,46 +726,6 @@ for i in {1..50}; do
 done
 ```
 
-Dashboard auto-refreshes every 5 seconds with new data.
-
-**Setup Guide**: [`docs/MINIMAL_MONITORING_SETUP.md`](./docs/MINIMAL_MONITORING_SETUP.md)  
-**Project Structure**: [`PROJECT_STRUCTURE.md`](./PROJECT_STRUCTURE.md)
-
----
-
-## 📞 Support & Documentation
-
-### Core Documentation
-
-| Document | Description |
-|----------|-------------|
-| [`docs/REPORT.md`](./docs/REPORT.md) | 📋 **Comprehensive project summary** - improvements, architecture, results |
-| [`docs/FINAL_PROJECT_REPORT.md`](./docs/FINAL_PROJECT_REPORT.md) | 📊 Detailed technical report (6 pages) |
-| [`docs/MINIMAL_MONITORING_SETUP.md`](./docs/MINIMAL_MONITORING_SETUP.md) | ⚡ 5-minute monitoring quick start |
-| [`docs/VISUAL_CONFIG_REFERENCE.md`](./docs/VISUAL_CONFIG_REFERENCE.md) | 🎨 Visual configuration guide with diagrams |
-| [`docs/DOCUMENTATION_INDEX.md`](./docs/DOCUMENTATION_INDEX.md) | 📚 Complete documentation index |
-
-### Setup & Configuration
-
-- **Environment Setup**: See "🚀 Quick Start" section above
-- **Docker Setup**: [`docs/MINIMAL_MONITORING_SETUP.md`](./docs/MINIMAL_MONITORING_SETUP.md)
-- **Deployment**: [`docs/GCP_IAM_SETUP.md`](./docs/GCP_IAM_SETUP.md)
-- **Database Config**: [`docs/DATABASE_CONFIG_GUIDE.md`](./docs/DATABASE_CONFIG_GUIDE.md)
-
-### Troubleshooting
-
-**Issue**: Tests failing locally  
-**Solution**: Check [`docs/TEST_DEPLOYMENT_REPORT.md`](./docs/TEST_DEPLOYMENT_REPORT.md)
-
-**Issue**: Deployment errors  
-**Solution**: See [`docs/GCP_IAM_SETUP.md`](./docs/GCP_IAM_SETUP.md)
-
-**Issue**: Monitoring not working  
-**Solution**: See troubleshooting in [`docs/MINIMAL_MONITORING_SETUP.md`](./docs/MINIMAL_MONITORING_SETUP.md)
-
-**Issue**: Database connection problems  
-**Solution**: Check [`docs/DATABASE_CONFIG_GUIDE.md`](./docs/DATABASE_CONFIG_GUIDE.md)
-
 ---
 
 ## 🎯 Project Status
@@ -803,12 +739,3 @@ Dashboard auto-refreshes every 5 seconds with new data.
 
 **Live URL**: https://github-actions-deployer-570395440561.us-central1.run.app/
 
----
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
----
-
-**Last Updated**: November 15, 2025 | **Status**: ✅ Production-Ready | **Version**: 1.0
